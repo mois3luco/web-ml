@@ -1,2 +1,5 @@
 # web-ml
-- Destination URL prediction with several machine learning (1.USA.gov dataset)
+
+Analysis of several machine learning algorithms to characterize web users (1.USA.gov dataset):
+
+- Destination URL prediction
