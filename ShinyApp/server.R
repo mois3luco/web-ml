@@ -1,9 +1,15 @@
 # server.R
 
 require(choroplethr)
+require(ggplot2)
 require(arulesViz)
+require(rattle)
+require(rpart.plot)
+require(RColorBrewer)
 load(".//data//map_data.RData")
+load(".//data//ua_data.RData")
 load(".//data//rules_data.RData")
+load(".//data//trees_data.RData")
 
 shinyServer(function(input, output, session) {
   
@@ -26,6 +32,29 @@ shinyServer(function(input, output, session) {
     
     state_choropleth(map_data, title=paste(map_title, "(01/01/13 a 17/05/13)", sep = " "),
     legend = "Nº total de clics", num_colors = input$mapNiveles)
+    
+  })
+  
+  # Pestaña "Perfiles de acceso"
+  output$ua_plot <- renderPlot({
+    
+    ua_data <- switch(input$uaClics, 
+                       "Total" = ua_total,
+                       "www.nasa.gov" = ua_nasa,
+                       "pld.dpi.wi.gov" = ua_pld,
+                       "www.fbi.gov" = ua_fbi
+    )
+    
+    ua_title <- switch(input$uaClics, 
+                       "Total" = "totales",
+                       "www.nasa.gov" = "www.nasa.gov",
+                       "pld.dpi.wi.gov" = "pld.dpi.wi.gov",
+                       "www.fbi.gov" = "www.fbi.gov"
+    )
+    
+    ggplot(ua_data)+geom_bar(aes(x=long_url,fill=ua_profiles),color="white",position ="fill")+
+    facet_grid(midweek~time)+ggtitle(paste("Perfiles de acceso", ua_title, sep = " "))+
+    labs(x="",y="Entre semana")
     
   })
   
@@ -68,6 +97,19 @@ shinyServer(function(input, output, session) {
       plot(rules, method="matrix3d", measure = input$rules_zaxis)
     }
 
+  })
+  
+  output$tree_plot <- renderPlot({
+    
+    t <- switch(input$tree, 
+      "known_user + midweek + ua_profiles" = t1,
+      "country_code + time + ua_profiles" = t2,
+      "known_user + midweek + time" = t3,
+      "country_code + referring_url + time" = t4
+    )
+
+    fancyRpartPlot(t, sub="")
+    
   })
   
 })

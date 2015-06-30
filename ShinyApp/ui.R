@@ -1,6 +1,6 @@
 # ui.R
 
-shinyUI(navbarPage(title=img(src="dit.png",height = 24, width = 24),
+shinyUI(navbarPage(title=img(src="dit.png",height = 24, width = 24), windowTitle="Dashboard",
                    
   # Pestaña "Clics geolocalizados"                 
   tabPanel("Clics geolocalizados",
@@ -20,10 +20,26 @@ shinyUI(navbarPage(title=img(src="dit.png",height = 24, width = 24),
     )
   ),
   
+  # Pestaña "Perfiles de acceso"
+  tabPanel("Perfiles de acceso",
+           sidebarLayout(
+             sidebarPanel(
+               selectInput("uaClics", 
+                           label = "Elige una web:",
+                           choices = c("Total", "www.nasa.gov", "pld.dpi.wi.gov", "www.fbi.gov"),
+                           selected = "pld.dpi.wi.gov"
+               )
+             ),
+             mainPanel(
+               plotOutput("ua_plot")
+             )
+           )
+  ),
+  
   # Pestaña "Reglas de asociación (Tabla)"
   tabPanel("Reglas de asociación (Tabla)",
     dataTableOutput("rules_table")
-  ), #, añadir más pestañas
+  ), 
   
   # Pestaña "Reglas de asociación (Gráfico)"
   tabPanel("Reglas de asociación (Gráfico)",
@@ -45,6 +61,23 @@ shinyUI(navbarPage(title=img(src="dit.png",height = 24, width = 24),
         plotOutput("rules_plot")
       )
     )          
-  )#, añadir más pestañas
+  ),
+  # Pestaña "Random Forests"
+  tabPanel("Random Forests",
+    sidebarLayout(
+      sidebarPanel(
+        radioButtons("tree",
+          label = "Selecciona un árbol:",
+          choices = list("known_user + midweek + ua_profiles", "country_code + time + ua_profiles",
+                         "known_user + midweek + time", "country_code + referring_url + time"),
+          selected = "known_user + midweek + ua_profiles"
+        )
+
+      ),
+      mainPanel(
+        plotOutput("tree_plot")
+      )
+    )          
+  )
   
 ))
